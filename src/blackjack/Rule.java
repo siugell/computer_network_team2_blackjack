@@ -24,7 +24,7 @@ public class Rule {
         return sum;
     }
 
-    public List<Integer> getCard(List<Card> cards){ // 카드 리 숫자로 통일하기
+    public List<Integer> getCard(List<Card> cards){ // 카드 리스트 각자 점수화
         List<Integer> cardNo = new ArrayList<>();
 
         for(int i=0; i<cards.size(); i++){
