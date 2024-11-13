@@ -3,6 +3,13 @@ package blackjack;
 import java.util.LinkedList;
 import java.util.List;
 
+/*
+    CardDeck 역할
+    - 전체 카드 덱을 생성
+    - 각 카드에 문양, index를 매긴다.
+    - random카드를 선택하여 return해준다.
+ */
+
 public class CardDeck {
     private List<Card> cards;
     private static final String[] PATTERNS = {"spade", "club", "heart", "diamond"};
@@ -18,21 +25,11 @@ public class CardDeck {
         for (String pattern : PATTERNS){
             for (int i = 1; i <= CARD_COUNT; i++)
             {
-                String denomination = this.numberToDenomination(i);
-                Card card = new Card(pattern, denomination);
+                Card card = new Card(pattern, i);
                 cards.add(card); //Card 객체를 List<Card>에 추가
             }
         }
         return cards; //생성 완료된 cardDeck을 리턴
-    }
-
-    private String numberToDenomination(int num) //카드의 숫자를 string으로 넘겨주는 함수
-    {
-        if(num == 1) return "A";
-        else if(num == 11) return "J";
-        else if(num == 12) return "Q";
-        else if(num == 13) return "K";
-        return String.valueOf(num);
     }
 
     public Card draw(){
