@@ -21,7 +21,7 @@ public class Play {
             List<Player> playingAfterPlayers = playingPhase(sc, cardDeck, startAfterPlayers);
 
             // 승자 판별
-            Player winner = rule.getWinner(playingAfterPlayers);
+            List<Player> winner = rule.getWinners(playingAfterPlayers);
 
             // 게임 종료
             endGame(winner, players);
@@ -126,12 +126,26 @@ public class Play {
         return players;
     }
 
-    private void endGame(Player winner, List<Player> players) {
+    private void endGame(List<Player> winners, List<Player> players) {
         System.out.println("\n========= Game Over =========");
+
+        // 모든 플레이어의 점수 출력
         for (Player player : players) {
             System.out.println(player.getName() + "의 점수: " + player.getPointSum());
         }
-        System.out.println("Winner is " + winner.getName());
+
+        // 승자 판별
+        if (winners.isEmpty()) {
+            System.out.println("\nNo winner! All players busted.");
+        } else if (winners.size() == 1) {
+            System.out.println("\nWinner is " + winners.get(0).getName() + " with a score of " + winners.get(0).getPointSum());
+        } else {
+            System.out.println("\nIt's a tie between the following players:");
+            for (Player winner : winners) {
+                System.out.println("- " + winner.getName() + " with a score of " + winner.getPointSum());
+            }
+        }
     }
+
 
 }

@@ -35,6 +35,13 @@ public class Card {
         return num;
     }
 
+    public boolean isAce(){
+        if (this.denomination.equals('A')){
+            return true;
+        }
+        return false;
+    }
+
     public int getPoint(){
         return this.point;
     }
