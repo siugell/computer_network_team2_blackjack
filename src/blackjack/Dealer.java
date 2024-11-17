@@ -29,7 +29,7 @@ public class Dealer implements Player {
         }
         int currentScore = getPointSum();
         if (currentScore > 21) {
-            System.out.println(this.name + "는 버스트 했습니다! (점수: " + currentScore + ")");
+            System.out.println(Dealer.name + "는 버스트 했습니다! (점수: " + currentScore + ")");
             this.turnOff(); // 턴 자동 종료
         }
     }
@@ -38,11 +38,24 @@ public class Dealer implements Player {
         return getPointSum() <= Limit_Receive_Point;
     }
 
-    public int getPointSum(){
+    public int getPointSum() {
         int sum = 0;
-        for(Card card : cards){
+        int aceCount = 0;
+
+        // 카드 점수 합산 및 Ace 개수 확인
+        for (Card card : cards) {
             sum += card.getPoint();
+            if (card.getPoint() == 11) {
+                aceCount++;
+            }
         }
+
+        // 총 점수가 21을 초과할 경우 Ace의 점수를 1로 변경
+        while (sum > 21 && aceCount > 0) {
+            sum -= 10; // Ace를 11에서 1로 변경
+            aceCount--;
+        }
+
         return sum;
     }
 
@@ -84,6 +97,6 @@ public class Dealer implements Player {
 
     @Override
     public String getName(){
-        return this.name;
+        return Dealer.name;
     }
 }

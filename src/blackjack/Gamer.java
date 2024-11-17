@@ -4,7 +4,6 @@ import java.util.LinkedList;
 import java.util.List;
 
 /*
-    Gamer 역할
     카드를 받는다, 받은 카드를 소유한다. 카드를 오픈한다.
 
  */
@@ -45,11 +44,24 @@ public class Gamer implements Player{
     }
 
     @Override
-    public int getPointSum(){
+    public int getPointSum() {
         int sum = 0;
-        for(Card card : cards){
+        int aceCount = 0;
+
+        // 카드 점수 합산 및 Ace 개수 확인
+        for (Card card : cards) {
             sum += card.getPoint();
+            if (card.getPoint() == 11) {
+                aceCount++;
+            }
         }
+
+        // 총 점수가 21을 초과할 경우 Ace의 점수를 1로 변경
+        while (sum > 21 && aceCount > 0) {
+            sum -= 10; // Ace를 11에서 1로 변경
+            aceCount--;
+        }
+
         return sum;
     }
 

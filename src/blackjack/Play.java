@@ -20,13 +20,11 @@ public class Play {
             List<Player> startAfterPlayers = startPhase(cardDeck, players);
             List<Player> playingAfterPlayers = playingPhase(sc, cardDeck, startAfterPlayers);
 
-            // 승자 출력
+            // 승자 판별
             Player winner = rule.getWinner(playingAfterPlayers);
 
-            for(Player player : players){
-                System.out.println(player.getName()+"의 점수 : "+player.getPointSum());
-            }
-            System.out.println("Winner is " + winner.getName());
+            // 게임 종료
+            endGame(winner, players);
         }
     }
 
@@ -127,4 +125,13 @@ public class Play {
         }
         return players;
     }
+
+    private void endGame(Player winner, List<Player> players) {
+        System.out.println("\n========= Game Over =========");
+        for (Player player : players) {
+            System.out.println(player.getName() + "의 점수: " + player.getPointSum());
+        }
+        System.out.println("Winner is " + winner.getName());
+    }
+
 }
