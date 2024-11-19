@@ -10,4 +10,4 @@ blackjack game project
 - network환경 구축
 
 ### issue
-- 유저가 한번도 카드를 뽑지않고 차례를 끝내면 dealer의 차례가 무한루프돌게됨
+- ~~유저가 한번도 카드를 뽑지않고 차례를 끝내면 dealer의 차례가 무한루프돌게됨~~ issue solved
