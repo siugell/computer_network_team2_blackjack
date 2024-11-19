@@ -4,6 +4,12 @@ public class Card {
     private String pattern; //heart, spade등 카드 문양을 나타냄
     private String denomination; //2~10, A~K의 카드 숫자를 나타냄
     private int point;
+    /*
+    카드를 생성하는 객체입니다.
+    pattern = 카드가 나타내는 문양
+    denomination = 카드가 나타내는 끗수(A~10, J~K)
+    point = 카드가 나타내는 점수를 뜻합니다. (burst, 승자를 판단할때 사용)
+     */
 
     public Card(String pattern, int index) //카드의 index만 받아 card내에서 숫자와 점수를 매김
     {
@@ -30,8 +36,9 @@ public class Card {
     private int numberToPoint(int num) {
         if (num >= 11) {
             return 10;
+        }else if(num == 1){
+            return 11;
         }
-
         return num;
     }
 
