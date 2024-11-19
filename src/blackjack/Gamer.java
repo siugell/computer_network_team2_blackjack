@@ -68,7 +68,7 @@ public class Gamer implements Player{
     @Override
     public List<Card> openCards(){  //유저의 손패를 전달
         return this.cards;
-    }
+    } //플레이어의 손패를 return
 
     @Override
     public void turnOff(){

@@ -19,15 +19,20 @@ public class Dealer implements Player {
         cards = new ArrayList<>(); //dealer의 손패
     }
 
+    /*
+    딜러가 카드를 받는 로직입니다.
+     */
     @Override
     public void receiveCard(Card card) {
-        if(this.isReceivedCard()){
-            this.cards.add(card);
+        if(this.isReceivedCard()){ //딜러는 16점 이상이면 카드를 받을 수 없으므로 차례가 오면 16이상인지 확인합니다.
+            this.cards.add(card); //16점 이하여서 카드를 받을 수 있을때
             this.showCards();
         }else{
-            System.out.println("점수의 합이 17이상입니다. 카드를 받을 수 없습니다.");
+            System.out.println("점수의 합이 17이상입니다. 카드를 받을 수 없습니다.");//16점 이상일때
+            this.turnOff();//턴종료
+            return;
         }
-        int currentScore = getPointSum();
+        int currentScore = getPointSum(); //현재 보유하고있는 카드의 점수를 합산하여 버스트인지 확인합니다.
         if (currentScore > 21) {
             System.out.println(Dealer.name + "는 버스트 했습니다! (점수: " + currentScore + ")");
             this.turnOff(); // 턴 자동 종료
