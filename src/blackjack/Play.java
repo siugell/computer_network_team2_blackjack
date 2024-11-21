@@ -1,38 +1,40 @@
 package blackjack;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Scanner;
+import java.util.*;
+import java.io.*;
 
 public class Play {
-
     private static final int START_RECEIVE_CARD_COUNT = 2;
     private static final String STOP_RECEIVE_CARD = "0";
+    private PrintWriter out;
+    private BufferedReader in;
+
+    public Play(PrintWriter out, BufferedReader in) {
+        this.out = out;
+        this.in = in;
+    }
 
     public void play() {
-        System.out.println("========= Blackjack =========");
-        try (Scanner sc = new Scanner(System.in)) {
+        out.println("================= Blackjack =================");
+        try {
             CardDeck cardDeck = new CardDeck();
             Rule rule = new Rule();
 
-            // 플레이어 설정 (유저와 딜러)
             List<Player> players = Arrays.asList(new Gamer("user 1"), new Dealer());
             List<Player> startAfterPlayers = startPhase(cardDeck, players);
-            List<Player> playingAfterPlayers = playingPhase(sc, cardDeck, startAfterPlayers);
+            List<Player> playingAfterPlayers = playingPhase(cardDeck, startAfterPlayers);
 
-            // 승자 판별
-            List<Player> winner = rule.getWinners(playingAfterPlayers);
-
-            // 게임 종료
-            endGame(winner, players);
+            List<Player> winners = rule.getWinners(playingAfterPlayers);
+            endGame(winners, players);
+        } catch (IOException e) {
+            out.println("게임 진행 중 오류가 발생했습니다: " + e.getMessage());
         }
     }
 
-    private List<Player> playingPhase(Scanner sc, CardDeck cardDeck, List<Player> players) {
+    private List<Player> playingPhase(CardDeck cardDeck, List<Player> players) throws IOException {
         List<Player> cardReceivedPlayers;
         while (true) {
-            cardReceivedPlayers = receiveCardAllPlayers(sc, cardDeck, players);
-
+            cardReceivedPlayers = receiveCardAllPlayers(cardDeck, players);
             if (isAllPlayerTurnOff(cardReceivedPlayers)) {
                 break;
             }
@@ -40,43 +42,36 @@ public class Play {
         return cardReceivedPlayers;
     }
 
-    private List<Player> receiveCardAllPlayers(Scanner sc, CardDeck cardDeck, List<Player> players) {
+    private List<Player> receiveCardAllPlayers(CardDeck cardDeck, List<Player> players) throws IOException {
         for (Player player : players) {
-            // 플레이어가 이미 턴을 종료한 경우 스킵
             if (!player.isTurn()) continue;
 
-            System.out.println("\n" + player.getName() + "'s turn.");
-
-            // 딜러의 경우 자동으로 한 장만 뽑고 턴 종료
+            out.println("-------------------------"); // 구분선 추가
+            out.println(player.getName() + "'s turn.");
             if (player instanceof Dealer) {
                 Dealer dealer = (Dealer) player;
                 if (dealer.isReceivedCard()) {
-                    System.out.println("딜러가 카드를 뽑습니다.");
+                    out.println("딜러가 카드를 뽑습니다.");
                     Card card = cardDeck.draw();
                     dealer.receiveCard(card);
-
-                    // 딜러의 점수가 17 이상이거나 버스트되면 턴 종료
-                    if (dealer.getPointSum() >= 17 || dealer.getPointSum() > 21) {
-                        dealer.turnOff();
-                        System.out.println("\n딜러의 점수가 17점 이상이거나 버스트 했습니다. 더 이상 카드를 받을 수 없습니다.");
-                        dealer.showCards();
-                    }
+                    out.println("딜러가 뽑은 카드: " + card.toString());
+                    dealer.showCards(out);
+                } else {
+                    dealer.turnOff();
                 }
                 continue;
             }
-
-            // 플레이어의 경우, 추가 카드를 받을지 여부 선택
-            // 버스트된 경우에는 카드를 받을지 묻지 않음
             if (player.getPointSum() > 21) {
-                System.out.println(player.getName() + "님이 이미 버스트 했습니다.");
+                out.println(player.getName() + "님이 이미 버스트 했습니다.");
                 player.turnOff();
                 continue;
             }
 
-            // 추가 카드를 받을지 선택
-            if (isReceiveCard(sc)) {
+            if (isReceiveCard()) {
                 Card card = cardDeck.draw();
                 player.receiveCard(card);
+                out.println(player.getName() + "가 뽑은 카드: " + card.toString());
+                player.showCards(out);
             } else {
                 player.turnOff();
             }
@@ -85,67 +80,62 @@ public class Play {
     }
 
     private boolean isAllPlayerTurnOff(List<Player> players) {
-        for (Player player : players) {
-            if (player.isTurn()) {
-                return false;
-            }
-        }
-        return true;
+        return players.stream().noneMatch(Player::isTurn);
     }
 
-    private boolean isReceiveCard(Scanner sc) {
-        System.out.println("추가 카드: 1, 종료: 0");
+    private boolean isReceiveCard() throws IOException {
+        out.println("추가 카드: 1, 종료: 0");
         while (true) {
-            String input = sc.nextLine();
-            if (input.equals("1")) {
+            String input = in.readLine(); // 클라이언트로부터 입력 받기
+            if ("1".equals(input)) {
                 return true;
-            } else if (input.equals(STOP_RECEIVE_CARD)) {
+            } else if (STOP_RECEIVE_CARD.equals(input)) {
                 return false;
             } else {
-                System.out.println("잘못된 입력입니다. 다시 입력하세요. 추가 카드: 1, 종료: 0");
+                out.println("잘못된 입력입니다. 다시 입력하세요. 추가 카드: 1, 종료: 0");
             }
         }
     }
 
     private List<Player> startPhase(CardDeck cardDeck, List<Player> players) {
-        System.out.println("\n게임 시작: 각 플레이어는 2장의 카드를 뽑습니다.");
+        out.println("게임 시작: 각 플레이어는 2장의 카드를 뽑습니다.");
         for (int i = 0; i < START_RECEIVE_CARD_COUNT; i++) {
             for (Player player : players) {
+                out.println("-------------------------"); // 구분선 추가
+                out.println(player.getName() + "가 카드를 뽑습니다.");
                 Card card = cardDeck.draw();
                 player.receiveCard(card);
-                System.out.println();
                 player.turnOn();
+                out.println(player.getName() + "가 뽑은 카드: " + card.toString());
             }
         }
 
-        // 각 플레이어의 초기 상태 출력
         for (Player player : players) {
-            System.out.println("\n" + player.getName() + "의 초기 상태:");
-            player.showCards();
+            out.println("-------------------------"); // 구분선 추가
+            out.println(player.getName() + "의 초기 카드 상태:");
+            player.showCards(out);
         }
         return players;
     }
 
     private void endGame(List<Player> winners, List<Player> players) {
-        System.out.println("\n========= Game Over =========");
-
-        // 모든 플레이어의 점수 출력
+        out.println("================= Game Over =================");
         for (Player player : players) {
-            System.out.println(player.getName() + "의 점수: " + player.getPointSum());
+            out.println("-------------------------");
+            out.println(player.getName() + "의 최종 카드 상태:");
+            player.showCards(out);
         }
 
-        // 승자 판별
         if (winners.isEmpty()) {
-            System.out.println("\nNo winner! All players busted.");
+            out.println("\n승자가 없습니다! 모든 플레이어가 버스트되었습니다.");
         } else if (winners.size() == 1) {
-            System.out.println("\nWinner is " + winners.get(0).getName() + " with a score of " + winners.get(0).getPointSum());
+            out.println("\n승자는 " + winners.get(0).getName() + "입니다! 점수: " + winners.get(0).getPointSum());
         } else {
-            System.out.println("\nIt's a tie between the following players:");
+            out.println("\n무승부입니다! 다음 플레이어가 동점입니다:");
             for (Player winner : winners) {
-                System.out.println("- " + winner.getName() + " with a score of " + winner.getPointSum());
+                out.println("- " + winner.getName() + " with a score of " + winner.getPointSum());
             }
         }
+        out.println("-------------------------");
     }
-
-
 }
