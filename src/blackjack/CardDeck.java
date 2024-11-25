@@ -23,7 +23,7 @@ public class CardDeck {
         List<Card> cards = new LinkedList<>(); //Card를 linkedlist로 만들어 carddeck객체를 생성
 
         for (String pattern : PATTERNS){
-            for (int i = 1; i <= CARD_COUNT; i++) //각 문양마다 1~13의 끗수를 갖고있는 카드를 생성합니다.
+            for (int i = 1; i <= CARD_COUNT; i++)
             {
                 Card card = new Card(pattern, i);
                 cards.add(card); //Card 객체를 List<Card>에 추가

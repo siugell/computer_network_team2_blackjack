@@ -1,4 +1,5 @@
 package blackjack;
+
 import java.io.*;
 import java.net.Socket;
 import java.util.Scanner;
@@ -10,20 +11,15 @@ public class client {
     private BufferedReader in;
     private PrintWriter out;
     private Scanner scanner;
-    private String clientId; // client ID
 
     public client() {
         try {
-            // Connect to the server
+            // 서버와 연결
             socket = new Socket(SERVER_HOST, SERVER_PORT);
             in = new BufferedReader(new InputStreamReader(socket.getInputStream()));
             out = new PrintWriter(socket.getOutputStream(), true);
             scanner = new Scanner(System.in);
             System.out.println("Connected to the Blackjack server.");
-
-            // client ID received
-            clientId = in.readLine();
-            System.out.println("Assigned Client ID: " + clientId);
         } catch (IOException e) {
             System.err.println("Unable to connect to the server: " + e.getMessage());
             System.exit(1);
@@ -33,29 +29,30 @@ public class client {
     public void start() {
         try {
             while (true) {
-                // Read server's message
+                // 서버 메시지 읽기
                 String serverMessage = in.readLine();
 
+                // 서버 연결이 종료된 경우 처리
                 if (serverMessage == null) {
                     System.out.println("Server connection has been closed.");
                     break;
                 }
 
-                System.out.println(serverMessage); // Display server message
+                // 서버 메시지 출력
+                System.out.println(serverMessage);
 
-                /* 1. 게임 시작 전, 게임에 참여할지 선택.
-                2. 게임 시작 선택시, 얼마를 배팅할지 선택.
-                3. 게임 진행 중, stand, hold를 선택.
-               */
-                if (serverMessage.startsWith("Input:")) {
-                    String userInput = scanner.nextLine(); // Read user input
-                    String formattedInput = clientId + ":" + userInput; //ID와 함께 입력값을 서버로 전송.
-                    out.println(formattedInput); // Send formatted input to server
-
-                    // If user chooses to quit, exit the client
-                    if (userInput.equalsIgnoreCase("quit game")) {
-                        System.out.println("You chose to quit the game. Disconnecting...");
-                        break;
+                // 클라이언트의 입력이 필요한 메시지인 경우
+                if (serverMessage.contains("추가 카드: 1, 종료: 0")) {
+                    String userInput = getUserInput(); // 사용자 입력
+                    out.println(userInput); // 서버로 입력 전송
+                } else if(serverMessage.contains("입력하세요.")){
+                	String userInput = getUserInput(); // 사용자 입력
+                    out.println(userInput); // 서버로 입력 전송
+                } else if (serverMessage.startsWith("다시 게임을 시작하시겠습니까")) {
+                    String userInput = getUserInput(); // 사용자 입력
+                    out.println(userInput); // 서버로 입력 전송
+                    if (userInput.equalsIgnoreCase("no")) {
+                        break; // 게임 종료
                     }
                 }
             }
@@ -66,6 +63,13 @@ public class client {
         }
     }
 
+    // 사용자 입력 처리 메서드
+    private String getUserInput() {
+        System.out.print("입력: ");
+        return scanner.nextLine();
+    }
+
+    // 클라이언트 종료 처리
     private void close() {
         try {
             if (socket != null) socket.close();
