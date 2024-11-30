@@ -69,7 +69,7 @@ public class ClientHandler implements Runnable {
             }
             int balance = Integer.parseInt(balanceInput);
             gamer = new Gamer(username, balance); // Gamer 객체 생성
-            out.println(username + "님의 게임이 시작됩니다! 현재 소지금: " + balance + "원");
+            out.println(username + "님 환영합니다! 현재 소지금: " + balance + "원");
 
             // 클라이언트 준비 완료를 서버에 알림
             latch.countDown();

@@ -8,7 +8,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 
 public class Server {
     private static final int PORT = 12345;
-    private static final int MAX_CLIENTS = 3;
+    private static final int MAX_CLIENTS = 2;
     private static CountDownLatch latch;
     private static AtomicInteger clientCount = new AtomicInteger(0);
     private static List<ClientHandler> clientHandlers = new ArrayList<>();
@@ -34,9 +34,7 @@ public class Server {
                 }
             }
 
-
             latch.await();
-
 
             Game game = new Game(clientHandlers);
             game.start();
